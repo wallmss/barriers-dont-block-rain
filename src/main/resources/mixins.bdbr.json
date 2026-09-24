@@ -8,6 +8,10 @@
     "WorldBlockMixin",
     "BiomeGenBaseMixin"
   ],
-  "client": [],
+  "client": [
+    "EntityRainFXMixin",
+    "EntityFXAccessor",
+    "ColorizerGrassMixin"
+  ],
   "server": []
 }

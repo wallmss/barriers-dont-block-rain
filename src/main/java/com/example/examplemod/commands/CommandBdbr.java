@@ -1,6 +1,8 @@
 package com.example.examplemod.commands;
 
 import com.example.examplemod.WeatherState;
+import com.example.examplemod.gui.GuiBdbr;
+import net.minecraft.client.Minecraft;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
@@ -13,7 +15,7 @@ import java.util.List;
 public class CommandBdbr extends CommandBase {
 
     private static final List<String> SUBCOMMANDS = Arrays.asList(
-            "on", "off", "status", "rain", "snow", "thunder", "clear", "vanilla"
+            "on", "off", "status", "rain", "snow", "thunder", "clear", "vanilla", "credito"
     );
 
     @Override
@@ -23,19 +25,23 @@ public class CommandBdbr extends CommandBase {
 
     @Override
     public String getCommandUsage(ICommandSender sender) {
-        return "/bdbr <on|off|status|rain|snow|thunder|clear|vanilla>";
+        return "/bdbr [menu|on|off|status|rain|snow|thunder|clear|vanilla|credito]";
     }
 
     @Override
     public void processCommand(ICommandSender sender, String[] args) throws CommandException {
+        // Sem argumentos: abre o menu (agendado com um pequeno atraso)
         if (args.length == 0) {
-            printStatus(sender);
+            openMenuWithDelay();
             return;
         }
 
         String sub = args[0].toLowerCase();
 
         switch (sub) {
+            case "menu":
+                openMenuWithDelay();
+                return;
             case "on":
                 WeatherState.setBarrierBypass(true);
                 msg(sender, "§a§l✔ §r§aBarreira: §fON");
@@ -67,11 +73,36 @@ public class CommandBdbr extends CommandBase {
                 WeatherState.setWeather(WeatherState.ClientWeather.VANILLA);
                 msg(sender, "§7§l⟲ §r§7Clima: §fVANILLA");
                 return;
+            case "credito":
+                msg(sender, "§6§lBDBR §r§7— §fBarriers Don't Block Rain");
+                msg(sender, "§7Feito por §b§lsx");
+                msg(sender, "§7GitHub: §fhttps://github.com/wallmss");
+                return;
             default:
                 error(sender, "Comando inválido: §f" + sub);
                 hint(sender);
         }
     }
+
+    /**
+     * Abre o GUI com um pequeno atraso para garantir que o chat fechou.
+     * Esta é a solução robusta para o problema de GUI abrindo e fechando.
+     */
+    private static void openMenuWithDelay() {
+        final Minecraft mc = Minecraft.getMinecraft();
+        new Thread(() -> {
+            try {
+                // Espera 100 milissegundos (mais que suficiente para o chat fechar)
+                Thread.sleep(100);
+            } catch (InterruptedException ignored) {
+                Thread.currentThread().interrupt();
+            }
+            // Agenda para rodar na thread principal do Minecraft
+            mc.addScheduledTask(() -> mc.displayGuiScreen(new GuiBdbr()));
+        }).start();
+    }
+
+    // ---- Daqui pra baixo, mantenha EXATAMENTE o que você já tinha ----
 
     private void printStatus(ICommandSender sender) {
         String bypass = WeatherState.barrierBypass ? "§a§lON" : "§c§lOFF";
@@ -83,7 +114,13 @@ public class CommandBdbr extends CommandBase {
             case CLEAR:   weather = "§6§lLIMPO";    break;
             default:      weather = "§7§lVANILLA";  break;
         }
-        msg(sender, "§6§lBDBR §r§8» §7Barreira: " + bypass + "  §8|  §7Clima: §r" + weather);
+        String color = WeatherState.hasParticleColor()
+                ? "§f#" + WeatherState.getParticleColorHex()
+                : "§7default";
+
+        msg(sender, "§6§lBDBR §r§8» §7Barreira: " + bypass
+                + "  §8|  §7Clima: §r" + weather
+                + "  §8|  §7Cor: §r" + color);
     }
 
     private static void msg(ICommandSender sender, String text) {
@@ -95,13 +132,17 @@ public class CommandBdbr extends CommandBase {
     }
 
     private static void hint(ICommandSender sender) {
-        sender.addChatMessage(new ChatComponentText("§7Uso: §f/bdbr <on|off|status|rain|snow|thunder|clear|vanilla>"));
+        sender.addChatMessage(new ChatComponentText(
+                "§7Uso: §f/bdbr [menu|on|off|status|rain|snow|thunder|clear|vanilla|credito]"));
     }
 
     @Override
     public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos) {
         if (args.length == 1) {
-            return getListOfStringsMatchingLastWord(args, SUBCOMMANDS.toArray(new String[0]));
+            String[] all = new String[SUBCOMMANDS.size() + 1];
+            all[0] = "menu";
+            for (int i = 0; i < SUBCOMMANDS.size(); i++) all[i + 1] = SUBCOMMANDS.get(i);
+            return getListOfStringsMatchingLastWord(args, all);
         }
         return null;
     }
