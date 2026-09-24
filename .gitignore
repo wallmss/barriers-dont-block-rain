@@ -1,0 +1,33 @@
+# Gradle
+.gradle/
+build/
+out/
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Eclipse
+.classpath
+.project
+.settings/
+bin/
+
+# VSCode
+.vscode/
+
+# Launch configs
+*.launch
+
+# Heap dumps / logs
+*.hprof
+*.log
+
+# Runtime (mundo de teste)
+run/
+
+# Sistema operacional
+.DS_Store
+Thumbs.db

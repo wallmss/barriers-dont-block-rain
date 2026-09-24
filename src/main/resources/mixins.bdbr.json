@@ -1,0 +1,13 @@
+{
+  "compatibilityLevel": "JAVA_8",
+  "package": "com.example.examplemod.mixins",
+  "refmap": "mixin.refmap.json",
+  "minVersion": "0.7.11",
+  "mixins": [
+    "WorldMixin",
+    "WorldBlockMixin",
+    "BiomeGenBaseMixin"
+  ],
+  "client": [],
+  "server": []
+}
