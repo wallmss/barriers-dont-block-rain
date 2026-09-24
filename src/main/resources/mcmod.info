@@ -9,7 +9,7 @@
   "updateUrl": "",
   "authorList": ["${author}"],
   "credits": "",
-  "logoFile": "",
+  "logoFile": "assets/bdbr/logo.png",
   "screenshots": [],
   "dependencies": []
 }

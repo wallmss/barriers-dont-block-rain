@@ -16,12 +16,11 @@ public class ExampleMod {
 
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
-        // nada por enquanto
+        BdbrConfig.init(event.getModConfigurationDirectory());
     }
 
     @EventHandler
     public void init(FMLInitializationEvent event) {
-        // Registra o comando no CLIENTE — funciona em singleplayer E multiplayer
         if (event.getSide() == Side.CLIENT) {
             ClientCommandHandler.instance.registerCommand(new CommandBdbr());
         }

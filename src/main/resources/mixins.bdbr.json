@@ -9,8 +9,10 @@
     "BiomeGenBaseMixin"
   ],
   "client": [
+    "EntityFXMixin",
     "EntityRainFXMixin",
     "EntityFXAccessor",
+    "EntityRendererMixin",
     "ColorizerGrassMixin"
   ],
   "server": []

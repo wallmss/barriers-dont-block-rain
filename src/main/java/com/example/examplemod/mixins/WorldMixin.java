@@ -1,5 +1,6 @@
 package com.example.examplemod.mixins;
 
+import com.example.examplemod.BdbrLog;
 import com.example.examplemod.HeightCache;
 import com.example.examplemod.WeatherState;
 import net.minecraft.block.BlockBarrier;
@@ -21,20 +22,29 @@ public abstract class WorldMixin {
         cancellable = true
     )
     private void bdbr$adjustForBarriers(BlockPos pos, CallbackInfoReturnable<BlockPos> cir) {
+        World world = (World)(Object)this;
+        if (!world.isRemote) return;
+
+        int x = pos.getX();
+        int z = pos.getZ();
+
+        // 1) Through-blocks mode: force Y = 0
+        if (WeatherState.weatherThroughBlocks) {
+            cir.setReturnValue(new BlockPos(x, 0, z));
+            return;
+        }
+
+        // 2) Barrier bypass mode
         if (!WeatherState.barrierBypass) return;
 
         BlockPos vanilla = cir.getReturnValue();
         if (vanilla == null) return;
 
-        World world = (World)(Object)this;
         BlockPos below = vanilla.down();
         if (below.getY() < 0) return;
 
         IBlockState belowState = world.getBlockState(below);
         if (!(belowState.getBlock() instanceof BlockBarrier)) return;
-
-        int x = pos.getX();
-        int z = pos.getZ();
 
         int cached = HeightCache.get(world, x, z);
         if (cached != Integer.MIN_VALUE) {
@@ -60,11 +70,7 @@ public abstract class WorldMixin {
         cir.setReturnValue(new BlockPos(x, result, z));
     }
 
-    @Inject(
-        method = "getRainStrength(F)F",
-        at = @At("HEAD"),
-        cancellable = true
-    )
+    @Inject(method = "getRainStrength(F)F", at = @At("HEAD"), cancellable = true)
     private void bdbr$getRainStrength(float partialTicks, CallbackInfoReturnable<Float> cir) {
         if (!WeatherState.hasWeatherOverride()) return;
 
@@ -79,7 +85,7 @@ public abstract class WorldMixin {
             case RAIN:
             case SNOW:
             case THUNDER:
-                cir.setReturnValue(1.0F);
+                cir.setReturnValue(WeatherState.rainStrength);
                 return;
             case VANILLA:
             default:
@@ -87,11 +93,7 @@ public abstract class WorldMixin {
         }
     }
 
-    @Inject(
-        method = "getThunderStrength(F)F",
-        at = @At("HEAD"),
-        cancellable = true
-    )
+    @Inject(method = "getThunderStrength(F)F", at = @At("HEAD"), cancellable = true)
     private void bdbr$getThunderStrength(float partialTicks, CallbackInfoReturnable<Float> cir) {
         if (!WeatherState.hasWeatherOverride()) return;
 

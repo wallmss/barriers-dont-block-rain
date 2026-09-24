@@ -15,4 +15,10 @@ public interface EntityFXAccessor {
 
     @Accessor("particleBlue")
     void bdbr$setParticleBlue(float blue);
+
+    @Accessor("particleScale")
+    float bdbr$getParticleScale();
+
+    @Accessor("particleScale")
+    void bdbr$setParticleScale(float scale);
 }
