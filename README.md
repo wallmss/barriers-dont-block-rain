@@ -89,7 +89,11 @@ Core hooks used:
 
 ## 📸 Screenshots / Showcase
 
-> Coming soon.
+### Snow falling inside a barrier-walled arena
+![Snow in barrier arena](screenshots/arena.png)
+
+### Configuration menu
+![Menu](screenshots/menu.png)
 
 ---
 
